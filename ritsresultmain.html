@@ -1,0 +1,150 @@
+<!DOCTYPE html >
+<head>
+<meta name="description" content="online multi timing solution, sports timing, multi timer, Singapore, NAPFA, 2.4km, test">
+<title>RiTSonline - Multi Timing solution - Results</title>
+<style>
+.TopHeader
+{
+	height:130px;
+	font-size:36px;
+	font-style:oblique;
+}
+
+.Results
+{
+	font-size:28px;
+}
+
+</style>
+
+<script>
+var emailstr="";
+
+function load()
+{
+	var strStartedAt=sessionStorage.getItem("KeyStartedAt");
+	strStartedAt="Timing capture started on "+strStartedAt;
+	
+	var txt=document.createTextNode(strStartedAt);				
+	document.getElementById("results").appendChild(txt);
+	
+	var str=document.createElement("br");					//new line
+	document.getElementById("results").appendChild(str);
+	var str=document.createElement("br");					//new line
+	document.getElementById("results").appendChild(str);
+	
+	str="Remarks: "+sessionStorage.getItem("KeyRemarks");
+	
+	txt=document.createTextNode(str);
+	document.getElementById("results").appendChild(txt);
+
+	for (i=1;i<41;i++)
+	{
+		
+		str=document.createElement("br");					//new line
+		document.getElementById("results").appendChild(str);
+		
+		txt=document.createTextNode(i+")");					//Runner number on left
+		document.getElementById("results").appendChild(txt);
+		emailstr=emailstr+i+")";
+		
+		var counterStr="lapCompleted"+i;
+		
+		str=sessionStorage.getItem(counterStr);				//number of laps completed
+		
+		var str2="lapTime"+i+"lap"+(str-1);					//timing of final lap
+		var finalTime=pad(parseInt(sessionStorage.getItem(str2)/60))+":"+pad(sessionStorage.getItem(str2)%60);
+		
+		var retireStr="retireKey"+i;
+	
+		if (sessionStorage.getItem(retireStr)=="true")
+		{
+			finalTime="Retire "+finalTime;
+		}
+		
+		str=" "+finalTime+" ["+str+"] ";							//combining to form 11:22 [5]
+		
+		emailstr=emailstr+str;
+		
+		txt=document.createTextNode(str);
+		document.getElementById("results").appendChild(txt);
+		
+		for (j=0;j<sessionStorage.getItem(counterStr);j++)		//to print out individual lap timing
+		{
+			var keyNow="lapTime"+i+"lap"+j;
+			var keyPre="lapTime"+i+"lap"+(j-1);
+			if (j==0)
+			{
+				str=pad(parseInt(sessionStorage.getItem(keyNow)/60))+":"+pad(sessionStorage.getItem(keyNow)%60)+" ";
+			}
+			else
+			{
+				str=pad(parseInt((sessionStorage.getItem(keyNow)-sessionStorage.getItem(keyPre))/60))+":"+pad((sessionStorage.getItem(keyNow)-sessionStorage.getItem(keyPre))%60)+" ";
+			}
+		
+			txt=document.createTextNode(str);
+			document.getElementById("results").appendChild(txt);
+			
+			emailstr=emailstr+str+" ";
+		}
+		emailstr=emailstr+"%0D%0A";
+
+	}
+	//alert(emailstr);
+}
+
+function SendEmail()
+{
+	var frontstr="Remarks: "+ sessionStorage.getItem("KeyRemarks");
+	var strStartedAt=sessionStorage.getItem("KeyStartedAt");	
+	
+	frontstr=frontstr+"%0D%0A%0D%0AExample on how to read the data:%0D%0A";
+	frontstr=frontstr+"4) 12:00 [6] 02:07 02:08 02:09 01:51 01:52 01:53 means Runner with Tag #4 took 12:00 to finish 6 laps with lap timings of lap1(02:07), lap2(02:08), lap3(02:09), etc.%0D%0A%0D%0A";
+
+			str=frontstr+emailstr+"%0D%0A%0D%0A-Captured using RiTSonline http://pe.dhs.sg/ritsonline.html";
+			
+	var bodystr="mailto: ?subject=RiTSonline Timing Results "+strStartedAt+"&body="+str;
+	document.location.href=bodystr;
+}
+
+/////////////////////////////////////////////Helper Functions////////////////////////////////////////
+
+function pad(val)			//Helps to pad 0 in front of figure if only 1 place
+{
+	var valString = val + "";
+	if(valString.length < 2)
+	{
+		return "0" + valString;
+	}
+	else
+	{
+		return valString;
+	}
+}
+
+</script>
+
+</head>
+<body onload="load()" bgcolor="FFEFD5">
+<div class="TopHeader">
+    <a href="http://pe.dhs.sg/ritsonline.html"><img src="RiTSLogo.gif" width="153px" height="70px"></a>
+    <br>
+    Thank you for using RiTSonline
+</div>
+
+<button onclick="SendEmail()" style="width:150px; height:40px; font-size:18px">Email Results</button>
+<div style="font-style:normal; font-size:14px";>Note: Email client must be configured properly to use this function. Alternatively, copy and paste the results to a Notes app.
+<br>
+Click <a href="ritsonline.html">here </a>to go back to RiTSonline. Remember to export your data first!
+</div>
+</div>
+<hr>
+<div style="font-weight:bold">Example on how to read the data:</div>
+<span style="color:#FF0000">4</span>) <span style="color:#999">12:00</span> [<span style="color:#00CC00">6</span>] <span style="color:#0000FF">02:07 02:08 02:09 01:51 1:52 1:53</span> means Runner with Tag #<span style="color:#FF0000">4</span> took <span style="color:#999">12:00</span> to finish <span style="color:#00CC00">6</span> laps with lap timings of lap1(<span style="color:#0000FF">02:07</span>), lap2(<span style="color:#0000FF">02:08</span>), lap3(<span style="color:#0000FF">02:09</span>), etc.
+<hr>
+<div class="Results" id="results" ></div>
+<br>
+<hr>
+<div style="font-style:italic">&#9786 RiTSonline is an iPad-optimised adaptation of RiTS. A timing solution developed by Ricky Tan(Singapore).&#9786 v1.1 <a href="ritshelp.html">Need Help?</a> | <a href="ritsonline.html">Home</a></div>
+</body>
+</html>
