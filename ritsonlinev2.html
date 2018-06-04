@@ -92,7 +92,7 @@
 
 .ButtonCSS
 {	
--webkit-appearance:none;
+        -webkit-appearance:none;
 	width:85px;
 	height:90px;
 	float:left;
@@ -179,47 +179,6 @@
 </style>
 
 <script>
-function NoClickDelay(el) {
-	this.element = el;
-	if( window.Touch ) this.element.addEventListener('touchstart', this, false);
-}
-
-NoClickDelay.prototype = {
-	handleEvent: function(e) {
-		switch(e.type) {
-			case 'touchstart': this.onTouchStart(e); break;
-			case 'touchmove': this.onTouchMove(e); break;
-			case 'touchend': this.onTouchEnd(e); break;
-		}
-	},
-
-	onTouchStart: function(e) {
-		e.preventDefault();
-		this.moved = false;
-
-		this.element.addEventListener('touchmove', this, false);
-		this.element.addEventListener('touchend', this, false);
-	},
-
-	onTouchMove: function(e) {
-		this.moved = true;
-	},
-
-	onTouchEnd: function(e) {
-		this.element.removeEventListener('touchmove', this, false);
-		this.element.removeEventListener('touchend', this, false);
-
-		if( !this.moved ) {
-			// Place your code here or use the click simulation below
-			var theTarget = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-			if(theTarget.nodeType == 3) theTarget = theTarget.parentNode;
-
-			var theEvent = document.createEvent('MouseEvents');
-			theEvent.initEvent('click', true, true);
-			theTarget.dispatchEvent(theEvent);
-		}
-	}
-};
 
 var d=new Date()
 var elapsedTimeDisplay="Nil";		
@@ -626,7 +585,7 @@ function testFunc()
 
 function bodyload()
 {
-	new NoClickDelay(document.getElementById('btnCanvas'));
+	//new NoClickDelay(document.getElementById('btnCanvas'));
 }
 /////////////////////////////////////Helper Functions END END END /////////////////////////////////////////////////
 </script>
@@ -635,7 +594,7 @@ function bodyload()
 
 <div style="width:970px">
 <div class="TopHeader" id="tHeader">
-	<div class="LogoHeader"><a href="https://rickytanpl.github.io"><img src="RiTSLogo.gif" width="153px" height="70px"></a></div>
+	<div class="LogoHeader"><a href="http://pe.dhs.sg/ritsonline.html"><img src="RiTSLogo.gif" width="153px" height="70px"></a></div>
     <button id="MultiBtn" onclick="multiClicked()" class="ButtonHeader">Start</button>
     
     <div class="ButtonHeaderSmallCanvas">
@@ -647,16 +606,13 @@ function bodyload()
     
     <div class="StatusBox" type="text" id="StatusPanel">Click Start!</div>
     <div type="text" id="minutes" class="Clock">00:00</div>
-
-    
-    <!--<button onclick="testFunc()" class="ButtonCSS"></button>  -->
     
 </div>
 
 <div width="960px">
 <div class="ButtonCanvas" id="btnCanvas">
 
-    <button onclick="btnFunc(1)" class="ButtonCSS" id="canvasBtn1">1</button>
+    <button onclick="btnFunc(1)" class="ButtonCSS" id="canvasBtn1">01</button>
     <button onclick="btnFunc(2)" class="ButtonCSS" id="canvasBtn2">2</button>
     <button onclick="btnFunc(3)" class="ButtonCSS" id="canvasBtn3">3</button>
     <button onclick="btnFunc(4)" class="ButtonCSS" id="canvasBtn4">4</button>
