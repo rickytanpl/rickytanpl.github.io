@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta name="description" content="online multi timing solution, sports timing, multi timer, Singapore, NAPFA, 1.6km, 2.4km, test">
-<meta name="viewport" content="user-scalable=yes">
+<meta name="viewport" content="width=device-witdth, content="initial-scale">
 <head>
 <title>RiTSonline - Multi Timing solution</title>
 <style>
@@ -131,6 +131,7 @@
 	border-style:solid;
 	border-width:0px;
 	float:left;
+        touch-action:manipulation;
 }
 
 .LapCountBox
@@ -179,48 +180,6 @@
 </style>
 
 <script>
-function NoClickDelay(el) {
-	this.element = el;
-	if( window.Touch ) this.element.addEventListener('touchstart', this, false);
-}
-
-NoClickDelay.prototype = {
-	handleEvent: function(e) {
-		switch(e.type) {
-			case 'touchstart': this.onTouchStart(e); break;
-			case 'touchmove': this.onTouchMove(e); break;
-			case 'touchend': this.onTouchEnd(e); break;
-		}
-	},
-
-	onTouchStart: function(e) {
-		e.preventDefault();
-		this.moved = false;
-
-		this.element.addEventListener('touchmove', this, false);
-		this.element.addEventListener('touchend', this, false);
-	},
-
-	onTouchMove: function(e) {
-		this.moved = true;
-	},
-
-	onTouchEnd: function(e) {
-		this.element.removeEventListener('touchmove', this, false);
-		this.element.removeEventListener('touchend', this, false);
-
-		if( !this.moved ) {
-			// Place your code here or use the click simulation below
-			var theTarget = document.elementFromPoint(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-			if(theTarget.nodeType == 3) theTarget = theTarget.parentNode;
-
-			var theEvent = document.createEvent('MouseEvents');
-			theEvent.initEvent('click', true, true);
-			theTarget.dispatchEvent(theEvent);
-		}
-	}
-};
-
 var d=new Date()
 var elapsedTimeDisplay="Nil";		
 var elapsedTime=0;			//to hold no. of milliseconds from 1970
@@ -297,9 +256,8 @@ function startClock()		//Called when Start button is clicked
 	
 	fullStartedAt=new Date();
 	
-	//document.getElementById("StatusPanel").innerHTML=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())+" START";
-updatePanel("START",0);
-		setInterval(setTime, 1000);
+        updatePanel("START",0);
+	setInterval(setTime, 1000);
 }
 
 function stopClock()
@@ -804,7 +762,7 @@ alt="free hit counters"></a></div></noscript>
 <!-- End of StatCounter Code for Dreamweaver -->
 
 <span style="font-style:italic">
-&#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore). &#9786 v1.3
+&#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore). &#9786 v1.4
 <a href="ritshelp.html">Help?</a> | <a href="ritsonline.html">iPhone/Desktop</a> | <a href="ritsonline-android.html">Android</a>
 </span>
 </div>
