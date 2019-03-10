@@ -225,12 +225,15 @@ function multiClicked()
 		startClock();
                 updatePanel("START",0);
 		document.getElementById("tHeader").style.backgroundColor="#98FB98";
-		document.getElementById("MinusBtn").disabled=false;
-		document.getElementById("AllBtn").disabled=false;
+		//document.getElementById("MinusBtn").disabled=false;
+		//document.getElementById("AllBtn").disabled=false;
                 document.getElementById("MinusBtn").innerHTML="Minus";
 		document.getElementById("AllBtn").innerHTML="+All";
-		
-
+                document.getElementById("MinusBtn").className="ButtonHeaderSmall";
+		document.getElementById("AllBtn").className="ButtonHeaderSmall";		
+                document.getElementById("MinusBtn").setAttribute('onclick', 'btnMinus()');
+		document.getElementById("AllBtn").setAttribute('onclick', 'btnAll()');
+                
 		if(retire)
 		{
 			swingBackToNormal();
@@ -289,10 +292,6 @@ function stopClock()
 
         updatePanel("STOP",0);
         
-	//var txt=document.createElement("br");
-//	document.getElementById("StatusPanel").appendChild(txt);
-//	txt=document.createTextNode(pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds()+" STOP"));
-//	document.getElementById("StatusPanel").appendChild(txt);
 }
 
 function manageResults()
@@ -415,6 +414,15 @@ function updatePanel(jobtype,x)
 			document.getElementById("StatusPanel").appendChild(txt);
 			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
 			break;
+
+			
+		case "TOTALLAPS":
+			txt=document.createTextNode("Total Laps = " + x);
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+
+
 	}
 }
 
@@ -515,6 +523,28 @@ function btnFunc(x)
 	
 	document.getElementById(str).style.backgroundColor="#BEBEBE";
 	setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},300);
+}
+
+function addTotalLaps()
+{
+    totalLaps = totalLaps + 1;
+    updatePanel("TOTALLAPS",totalLaps);
+}
+
+function minusTotalLaps()
+{
+    if (totalLaps > 0)
+    {
+        totalLaps = totalLaps - 1;
+        if (totalLaps > 0)
+        {
+            updatePanel("TOTALLAPS",totalLaps);
+        }
+        else
+        {
+            updatePanel("TOTALLAPS","unlimited");
+        }
+    }
 }
 
 function addLap(x)
@@ -620,8 +650,8 @@ function testFunc()
     
     <div class="ButtonHeaderSmallCanvas">
         <button onclick="btnRetire()" id="RetireBtn" class="ButtonHeaderSmall">Retire</button>
-        <button onclick="btnMinus()" id="MinusBtn" class="ButtonHeaderLaps" disabled>+</button>
-        <button onclick="btnAll()" id="AllBtn" class="ButtonHeaderLaps" disabled>-</button>
+        <button onclick="addTotalLaps()" id="MinusBtn" class="ButtonHeaderLaps">+</button>
+        <button onclick="minusTotalLaps()" id="AllBtn" class="ButtonHeaderLaps">-</button>
         <input class="Remarks" id="RemarksBox" placeholder="Enter remarks here"></input>
     </div>
     
