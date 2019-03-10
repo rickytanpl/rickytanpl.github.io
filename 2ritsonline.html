@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<meta name="description" content="online multi timing solution, sports timing, multi timer, Singapore, NAPFA, 2.4km, test">
+<meta name="viewport" content="width=device-witdth, content="initial-scale">
+<head>
+<title>RiTSonline - Multi Timing solution</title>
+
+<style>
+
+.TopHeader
+{
+	width:960px;
+	height:100px;
+	background-color:#EECBAD;
+	border-style:solid;
+	border-width:1px;
+	float:left;
+}
+
+.LogoHeader
+{
+	width:175px;
+	height:75px;
+	border-width:1px;
+	float:left;
+	padding: 15px 0px 0px 15px;
+}
+
+.ButtonHeader
+{
+	-webkit-appearance:none;
+	width:80px;
+	height:90px;
+	float:left;
+	font-size:20px;
+	padding:0 0 0 0;
+	text-align:center;
+	background-color:#E6E6FA;
+}
+
+.ButtonHeaderSmallCanvas
+{
+	width:240px;
+	height:90px;
+	float:left;
+	padding:0 0 0 0;
+}
+
+.ButtonHeaderSmall
+{
+	-webkit-appearance:none;
+	width:80px;
+	height:60px;
+	float:left;
+	font-size:20px;
+	padding:0 0 0 0;
+	text-align:center;
+	background-color:#E6E6FA;
+}
+
+.ButtonHeaderLaps
+{
+	-webkit-appearance:none;
+	width:80px;
+	height:60px;
+	float:left;
+	font-size:50px;
+	padding:0 0 0 0;
+	text-align:center;
+	background-color:#E6E6FA;
+}
+
+
+.Remarks
+{
+	-webkit-appearance:none;
+	width:220px;
+	height:18px;
+	border-width:1px;
+	font-size:14px;
+	float:left;
+	text-align:left;
+	margin:5px 0px 0px 5px;
+}
+
+.StatusBox
+{
+	width:220px;
+	height:90px;
+	background-color:#E6E6FA;
+	border-style:solid;
+	border-width:1px;
+	float:left;
+	overflow:scroll;
+	Margin:2px 0px 0px 5px;
+}
+
+.Clock
+{
+	width:220px;
+	height:90px;
+	border-width:1px;
+	font-size:90px;
+	float:left;
+	text-align:center;
+}
+
+.ButtonCSS
+{	
+        -webkit-appearance:none;
+	width:85px;
+	height:60px;
+	float:left;
+	font-size:40px;
+	padding:0px 0px 0px 0px;
+	margin:0px 0px 0px 0px;
+	text-align:center;
+	background-color:#FFFACD;
+}
+
+.Logo
+{
+	width:200px;
+	height:90px;
+	border-width:1px;
+	font-size:80px;
+	float:left;
+	text-align:center;
+}
+
+.ButtonCanvas
+{
+	width:850px;
+	height:360px;
+	background-color:#FFEFD5;
+	border-style:solid;
+	border-width:1px;
+	float:left;
+}
+
+.ButtonBox
+{
+	width:85px;
+	height:90px;
+	background-color:#6F0
+	border-style:solid;
+	border-width:0px;
+	float:left;
+        touch-action:manipulation;
+}
+
+.LapCountBox
+{	
+	width:85px;
+	height:30px;
+	background-color:#09F
+	border-style:solid;
+	border-width:0px;
+	float:left;
+	font-size:28px;
+	color:#999999;
+	padding:0 0 0 0;
+	text-align:center;
+}
+
+.TimingBar
+{
+	width:108px;
+	height:360px;
+	background-color:#EECBAD;
+	border-style:solid;
+	border-width:1px;
+	float:left;
+	overflow:scroll;
+}
+
+.TimingBox
+{
+	width:66px;
+	height:24px;
+	border-style:solid;
+	border-width:1px;
+	float:left;
+	font-size:20px;
+}
+
+.TimingBoxLabel
+{
+	width:18px;
+	height:24px;
+	border-width:1px;
+	float:left;
+	font-size:20px;
+}
+</style>
+
+<script>
+var d=new Date()
+var elapsedTimeDisplay="Nil";		
+var elapsedTime=0;			//to hold no. of milliseconds from 1970
+var runStartedAt;	
+var fullStartedAt;		//to hold time started in milliseconds from 1970
+var started=false;
+var stopped=false;
+var minus=false;
+var retire=false;
+var totalLaps=0;
+
+////////////////////////////////////Initialise Array/////////////////////////////////////////////////
+var TArray=new Array(41);
+var RArray=new Array(41);
+
+for (i=0;i<41;i++)
+{
+	TArray[i]=new Array();                  //TimeArray. To hold all runners' arrays of timings.
+	RArray[i]=false;			//RetireArray. To indicate if a runner has retired
+}
+///////////////////////////////////Initialise Array END END END//////////////////////////////////////
+
+/////////////////////////////////////Header Buttons Functions//////////////////////////////////////////
+function multiClicked()
+//This controls the behaviour of the Start/Stop/Result button.
+{
+	if (!started && !stopped)   //Start clicked
+	{
+		startClock();
+                updatePanel("START",0);
+		document.getElementById("tHeader").style.backgroundColor="#98FB98";
+		document.getElementById("MinusBtn").disabled=false;
+		document.getElementById("AllBtn").disabled=false;
+                document.getElementById("MinusBtn").innerHTML="Minus";
+		document.getElementById("AllBtn").innerHTML="+All";
+		
+
+		if(retire)
+		{
+			swingBackToNormal();
+		}
+	}
+	else if (started && !stopped)   //Stop clicked.
+	{
+		var str="Confirm Stop?";
+	
+		if (confirm(str))
+		{
+			stopClock();
+			document.getElementById("tHeader").style.backgroundColor="#EECBAD";
+			stopped=true;
+		}
+	}
+	else if (started && stopped)        //Results clicked.
+	{
+		manageResults();
+	}	
+}
+
+function swingBackToNormal()
+{
+	retire=false;
+	minus=false;
+	document.getElementById("tHeader").style.backgroundColor="#98FB98";
+	if(started)
+	{
+		document.getElementById("AllBtn").disabled=false;
+	}
+	document.getElementById("RetireBtn").innerHTML="Retire";
+	document.getElementById("MinusBtn").innerHTML="Minus";	
+}
+
+function startClock()		//Called when Start button is clicked
+{
+	started=true;
+	document.getElementById("MultiBtn").innerHTML="Stop";
+
+	d=new Date();
+	runStartedAt=d.getTime();
+	fullStartedAt=new Date();
+	
+	setInterval(setTime, 1000);
+}
+
+function stopClock()
+{
+	stopped=true;
+
+	document.getElementById("MultiBtn").innerHTML="Results";
+	document.getElementById("MinusBtn").disabled=true;
+	document.getElementById("RetireBtn").disabled=true;
+	document.getElementById("AllBtn").disabled=true;
+
+        updatePanel("STOP",0);
+        
+	//var txt=document.createElement("br");
+//	document.getElementById("StatusPanel").appendChild(txt);
+//	txt=document.createTextNode(pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds()+" STOP"));
+//	document.getElementById("StatusPanel").appendChild(txt);
+}
+
+function manageResults()
+{
+	for (i=1;i<41;i++)
+	{
+		var key="lapCompleted"+i;
+		sessionStorage.setItem(key,TArray[i].length);
+		
+		key="retireKey"+i;
+		sessionStorage.setItem(key,RArray[i]);
+			
+		for (j=0;j<TArray[i].length;j++)
+		{
+			var key2="lapTime"+i+"lap"+j;
+			sessionStorage.setItem(key2,TArray[i][j]);
+		}
+	}
+	
+	var resultStr=new Array(41);
+	for (i=1;i<41;i++)
+	{
+		resultStr[i]=String(i)+") ["+TArray[i].length+"] ";
+		
+		for (j=TArray[i].length;j>0;j--)
+		{
+			resultStr[i]=resultStr[i] + String(TArray[i][j-1])+" ";
+		}
+			
+		var key="Key"+i;
+		sessionStorage.setItem(key,resultStr[i]);
+	}
+	
+	sessionStorage.setItem("KeyRemarks",document.getElementById("RemarksBox").value);
+	
+	var str=fullStartedAt.getDate()+"/"+(fullStartedAt.getMonth()+1)+"/"+fullStartedAt.getFullYear()+" "+pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds());
+
+	sessionStorage.setItem("KeyStartedAt",str);
+	
+	window.location.href="ritsresultmain.html";
+	return false;
+}
+
+function checkEmail(x)
+{
+	var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+	if (!filter.test(x))
+	{
+	alert('Please provide a valid email address');
+	return false;
+	}
+	return true;
+}
+	
+function setTime()		//called to refresh elapsedTimeDisplay
+{
+	if(!stopped)
+	{
+		d=new Date();
+	   
+		elapsedTime=parseInt((d.getTime()-runStartedAt)/1000);
+		elapsedTimeDisplay=(pad(parseInt(elapsedTime/60)))+":"+(pad(elapsedTime%60));
+	
+		document.getElementById("minutes").innerHTML=elapsedTimeDisplay;
+	}
+}
+
+function updatePanel(jobtype,x)
+//This updates the output panel, based on the jobtype.
+{
+	var txt=document.createElement("br");
+	document.getElementById("StatusPanel").appendChild(txt);
+	
+	var str=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())+" ";
+	
+	switch(jobtype)
+	{
+		case "START":
+			txt=document.createTextNode(str+"STARTED");
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+		case "STOP":
+			txt=document.createTextNode(str+"STOPPED");
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+		case "LAP":
+			txt=document.createTextNode(str+"Add Lap #"+x);
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+		
+		case "MINUS":
+			txt=document.createTextNode(str+"Minus Lap #"+x);
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+			
+		case "MINUSMODE":
+			txt=document.createTextNode(str+"Minus Mode Enabled");
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+			
+		case "RETIRE":
+			txt=document.createTextNode(str+"Retire #"+x);
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+			
+		case "RETIREMODE":
+			txt=document.createTextNode(str+"Retire Mode Enabled");
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+			
+		case "ALL":
+			txt=document.createTextNode(str+"Add Lap for ALL");
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+	}
+}
+
+function btnMinus()
+{
+	if (started && !stopped)
+	{
+		if (!minus)
+		{
+			minus=true;
+			retire=false;
+			document.getElementById("RetireBtn").innerHTML="Retire";
+			document.getElementById("tHeader").style.backgroundColor="#00CED1";
+			document.getElementById("MinusBtn").innerHTML="Normal";
+			document.getElementById("AllBtn").disabled=true;
+		}
+		else
+		{
+			swingBackToNormal();
+		}
+	}
+}
+
+function btnRetire()
+{
+	if (!stopped)
+	//if (started && !stopped)
+	{
+		if (!retire)
+		{
+			retire=true;
+			minus=false;
+			document.getElementById("MinusBtn").innerHTML="Minus";
+			document.getElementById("tHeader").style.backgroundColor="#FFA07A";
+			document.getElementById("RetireBtn").innerHTML="Normal";
+			document.getElementById("AllBtn").disabled=true;
+		}
+		else
+		{
+			swingBackToNormal();
+		}
+	}
+}
+
+function btnAll()
+{
+	if (started && !minus && !retire &&!stopped)
+	{
+		var str="+1 Lap for all?";
+		
+		if (confirm(str))
+		{
+			for (i=1;i<41;i++)
+			{
+				if (!RArray[i])
+				{
+					addLap(i);
+					updateBarAndLap(i);
+				}
+			}
+			updatePanel("ALL",i);
+		}
+	}
+}
+/////////////////////////////////////Header Buttons Functions END END END/////////////////////////////////////////
+
+/////////////////////////////////////Canvas Buttons Functions////////////////////////////////////////
+function btnFunc(x)
+{
+	if (started && !minus && !retire &&!stopped)			//Normal Mode
+	{
+		addLap(x);
+		updatePanel("LAP",x);
+		updateBarAndLap(x);
+	}
+	else if(started && minus)					//Minus Mode
+	{
+		minusLap(x);
+		updateBarAndLap(x);
+		swingBackToNormal();
+	}
+	else if (started && retire)					//Retire Mode
+	{
+		retireFunc(x);
+		updateBarAndLap(x);
+		swingBackToNormal();
+	}
+	else if(!started && retire)				//Retire before start
+	{
+		retireFunc(x);
+		updateBarAndLap(x);
+	}
+	
+	/////////Toggle button color when clicked
+	
+	var str="canvasBtn";
+	str=str+x;
+	
+	document.getElementById(str).style.backgroundColor="#BEBEBE";
+	setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},300);
+}
+
+function addLap(x)
+{
+	d=new Date();
+	   
+	elapsedTime=parseInt((d.getTime()-runStartedAt)/1000);
+	TArray[x].push(elapsedTime);
+}
+
+function minusLap(x)
+{
+	if (TArray[x].length>0)
+	{
+		TArray[x].pop();
+		updatePanel("MINUS",x);
+	}
+}
+
+function retireFunc(x)
+{	
+	var str="Retire "+x+"?";
+	
+	if (confirm(str))
+	{
+		var strvalue="canvasBtn"+x;
+		document.getElementById(strvalue).disabled=true;
+		
+		strvalue="TBox"+x;
+		document.getElementById(strvalue).style.color="#778899";
+		
+		RArray[x]=true;
+		updatePanel("RETIRE",x);
+	}
+}
+
+function updateBarAndLap(x)
+{
+	var str="TBox"+x;				//Update Bar
+	if(TArray[x].length==0)
+	{
+		if(RArray[x]==true)
+		{
+			document.getElementById(str).innerHTML="00:00R";
+		}
+		else
+		{
+			document.getElementById(str).innerHTML="00:00";
+		}
+	}
+	else
+	{
+		var t=TArray[x][(TArray[x].length-1)];
+		var s=":";
+		s=pad(parseInt(t/60))+s;
+		s=s+String(pad(t%60));
+		if (RArray[x]==true)
+		{
+			s=s+"R";
+		}
+		document.getElementById(str).innerHTML=s;
+	}
+	
+	str="LapBox"+x;				//Update Lap
+	
+	if (!retire)
+	document.getElementById(str).innerHTML=TArray[x].length;
+}
+
+/////////////////////////////////////Canvas Buttons Functions END END END ////////////////////////////////////////
+
+/////////////////////////////////////Helper Functions//////////////////////////////////////////////////////////
+function pad(val)			//Helps to pad 0 in front of figure if only 1 place
+{
+	var valString = val + "";
+	if(valString.length < 2)
+	{
+		return "0" + valString;
+	}
+	else
+	{
+		return valString;
+	}
+}
+
+function testFunc()
+{
+	alert("test");
+	alert(document.getElementById("RemarksBox").value);
+}
+
+/////////////////////////////////////Helper Functions END END END /////////////////////////////////////////////////
+</script>
+
+</head>
+
+<div style="width:970px">
+<div class="TopHeader" id="tHeader">
+
+    <div class="LogoHeader"><a href="index.html"><img src="RiTSLogo.gif" width="153px" height="70px"></a></div>
+
+    <button id="MultiBtn" onclick="multiClicked()" class="ButtonHeader">Start</button>
+    
+    <div class="ButtonHeaderSmallCanvas">
+        <button onclick="btnRetire()" id="RetireBtn" class="ButtonHeaderSmall">Retire</button>
+        <button onclick="btnMinus()" id="MinusBtn" class="ButtonHeaderLaps" disabled>+</button>
+        <button onclick="btnAll()" id="AllBtn" class="ButtonHeaderLaps" disabled>-</button>
+        <input class="Remarks" id="RemarksBox" placeholder="Enter remarks here"></input>
+    </div>
+    
+    <div class="StatusBox" type="text" id="StatusPanel">Click Start!</div>
+    <div type="text" id="minutes" class="Clock">00:00</div>
+
+    
+    <!--<button onclick="testFunc()" class="ButtonCSS"></button>  -->
+    
+</div>
+
+<div width="960px">
+<div class="ButtonCanvas" id="btnCanvas">
+
+    <button onclick="btnFunc(1)" class="ButtonCSS" id="canvasBtn1">1</button>
+    <button onclick="btnFunc(2)" class="ButtonCSS" id="canvasBtn2">2</button>
+    <button onclick="btnFunc(3)" class="ButtonCSS" id="canvasBtn3">3</button>
+    <button onclick="btnFunc(4)" class="ButtonCSS" id="canvasBtn4">4</button>
+    <button onclick="btnFunc(5)" class="ButtonCSS" id="canvasBtn5">5</button>
+    <button onclick="btnFunc(6)" class="ButtonCSS" id="canvasBtn6">6</button>
+    <button onclick="btnFunc(7)" class="ButtonCSS" id="canvasBtn7">7</button>
+    <button onclick="btnFunc(8)" class="ButtonCSS" id="canvasBtn8">8</button>
+    <button onclick="btnFunc(9)" class="ButtonCSS" id="canvasBtn9">9</button>
+    <button onclick="btnFunc(10)" class="ButtonCSS" id="canvasBtn10">10</button>
+    
+    <div class="LapCountBox" id="LapBox1">0</div>
+    <div class="LapCountBox" id="LapBox2">0</div>
+    <div class="LapCountBox" id="LapBox3">0</div>
+    <div class="LapCountBox" id="LapBox4">0</div>
+    <div class="LapCountBox" id="LapBox5">0</div>
+    <div class="LapCountBox" id="LapBox6">0</div>
+    <div class="LapCountBox" id="LapBox7">0</div>
+    <div class="LapCountBox" id="LapBox8">0</div>
+    <div class="LapCountBox" id="LapBox9">0</div>
+    <div class="LapCountBox" id="LapBox10">0</div>
+    
+    <button onclick="btnFunc(11)" class="ButtonCSS" id="canvasBtn11">11</button>
+    <button onclick="btnFunc(12)" class="ButtonCSS" id="canvasBtn12">12</button>
+    <button onclick="btnFunc(13)" class="ButtonCSS" id="canvasBtn13">13</button>
+    <button onclick="btnFunc(14)" class="ButtonCSS" id="canvasBtn14">14</button>
+    <button onclick="btnFunc(15)" class="ButtonCSS" id="canvasBtn15">15</button>
+    <button onclick="btnFunc(16)" class="ButtonCSS" id="canvasBtn16">16</button>
+    <button onclick="btnFunc(17)" class="ButtonCSS" id="canvasBtn17">17</button>
+    <button onclick="btnFunc(18)" class="ButtonCSS" id="canvasBtn18">18</button>
+    <button onclick="btnFunc(19)" class="ButtonCSS" id="canvasBtn19">19</button>
+    <button onclick="btnFunc(20)" class="ButtonCSS" id="canvasBtn20">20</button>
+    <div class="LapCountBox" id="LapBox11">0</div>
+    <div class="LapCountBox" id="LapBox12">0</div>
+    <div class="LapCountBox" id="LapBox13">0</div>
+    <div class="LapCountBox" id="LapBox14">0</div>
+    <div class="LapCountBox" id="LapBox15">0</div>
+    <div class="LapCountBox" id="LapBox16">0</div>
+    <div class="LapCountBox" id="LapBox17">0</div>
+    <div class="LapCountBox" id="LapBox18">0</div>
+    <div class="LapCountBox" id="LapBox19">0</div>
+    <div class="LapCountBox" id="LapBox20">0</div>
+    <button onclick="btnFunc(21)" class="ButtonCSS" id="canvasBtn21">21</button>
+    <button onclick="btnFunc(22)" class="ButtonCSS" id="canvasBtn22">22</button>
+    <button onclick="btnFunc(23)" class="ButtonCSS" id="canvasBtn23">23</button>
+    <button onclick="btnFunc(24)" class="ButtonCSS" id="canvasBtn24">24</button>
+    <button onclick="btnFunc(25)" class="ButtonCSS" id="canvasBtn25">25</button>
+    <button onclick="btnFunc(26)" class="ButtonCSS" id="canvasBtn26">26</button>
+    <button onclick="btnFunc(27)" class="ButtonCSS" id="canvasBtn27">27</button>
+    <button onclick="btnFunc(28)" class="ButtonCSS" id="canvasBtn28">28</button>
+    <button onclick="btnFunc(29)" class="ButtonCSS" id="canvasBtn29">29</button>
+    <button onclick="btnFunc(30)" class="ButtonCSS" id="canvasBtn30">30</button>
+    <div class="LapCountBox" id="LapBox21">0</div>
+    <div class="LapCountBox" id="LapBox22">0</div>
+    <div class="LapCountBox" id="LapBox23">0</div>
+    <div class="LapCountBox" id="LapBox24">0</div>
+    <div class="LapCountBox" id="LapBox25">0</div>
+    <div class="LapCountBox" id="LapBox26">0</div>
+    <div class="LapCountBox" id="LapBox27">0</div>
+    <div class="LapCountBox" id="LapBox28">0</div>
+    <div class="LapCountBox" id="LapBox29">0</div>
+    <div class="LapCountBox" id="LapBox30">0</div>
+    <button onclick="btnFunc(31)" class="ButtonCSS" id="canvasBtn31">31</button>
+    <button onclick="btnFunc(32)" class="ButtonCSS" id="canvasBtn32">32</button>
+    <button onclick="btnFunc(33)" class="ButtonCSS" id="canvasBtn33">33</button>
+    <button onclick="btnFunc(34)" class="ButtonCSS" id="canvasBtn34">34</button>
+    <button onclick="btnFunc(35)" class="ButtonCSS" id="canvasBtn35">35</button>
+    <button onclick="btnFunc(36)" class="ButtonCSS" id="canvasBtn36">36</button>
+    <button onclick="btnFunc(37)" class="ButtonCSS" id="canvasBtn37">37</button>
+    <button onclick="btnFunc(38)" class="ButtonCSS" id="canvasBtn38">38</button>
+    <button onclick="btnFunc(39)" class="ButtonCSS" id="canvasBtn39">39</button>
+    <button onclick="btnFunc(40)" class="ButtonCSS" id="canvasBtn40">40</button>
+    <div class="LapCountBox" id="LapBox31">0</div>
+    <div class="LapCountBox" id="LapBox32">0</div>
+    <div class="LapCountBox" id="LapBox33">0</div>
+    <div class="LapCountBox" id="LapBox34">0</div>
+    <div class="LapCountBox" id="LapBox35">0</div>
+    <div class="LapCountBox" id="LapBox36">0</div>
+    <div class="LapCountBox" id="LapBox37">0</div>
+    <div class="LapCountBox" id="LapBox38">0</div>
+    <div class="LapCountBox" id="LapBox39">0</div>
+    <div class="LapCountBox" id="LapBox40">0</div>
+</div>
+
+<div class="TimingBar">
+    <div class="TimingBox" id="TBox1">00:00</div><div class="TimingBoxLabel">1</div>
+    <div class="TimingBox" id="TBox2">00:00</div><div class="TimingBoxLabel">2</div>
+    <div class="TimingBox" id="TBox3">00:00</div><div class="TimingBoxLabel">3</div>
+    <div class="TimingBox" id="TBox4">00:00</div><div class="TimingBoxLabel">4</div>
+    <div class="TimingBox" id="TBox5">00:00</div><div class="TimingBoxLabel">5</div>
+    <div class="TimingBox" id="TBox6">00:00</div><div class="TimingBoxLabel">6</div>
+    <div class="TimingBox" id="TBox7">00:00</div><div class="TimingBoxLabel">7</div>
+    <div class="TimingBox" id="TBox8">00:00</div><div class="TimingBoxLabel">8</div>
+    <div class="TimingBox" id="TBox9">00:00</div><div class="TimingBoxLabel">9</div>
+    <div class="TimingBox" id="TBox10">00:00</div><div class="TimingBoxLabel">10</div>
+    <div class="TimingBox" id="TBox11">00:00</div><div class="TimingBoxLabel">11</div>
+    <div class="TimingBox" id="TBox12">00:00</div><div class="TimingBoxLabel">12</div>
+    <div class="TimingBox" id="TBox13">00:00</div><div class="TimingBoxLabel">13</div>
+    <div class="TimingBox" id="TBox14">00:00</div><div class="TimingBoxLabel">14</div>
+    <div class="TimingBox" id="TBox15">00:00</div><div class="TimingBoxLabel">15</div>
+    <div class="TimingBox" id="TBox16">00:00</div><div class="TimingBoxLabel">16</div>
+    <div class="TimingBox" id="TBox17">00:00</div><div class="TimingBoxLabel">17</div>
+    <div class="TimingBox" id="TBox18">00:00</div><div class="TimingBoxLabel">18</div>
+    <div class="TimingBox" id="TBox19">00:00</div><div class="TimingBoxLabel">19</div>
+    <div class="TimingBox" id="TBox20">00:00</div><div class="TimingBoxLabel">20</div>
+    <div class="TimingBox" id="TBox21">00:00</div><div class="TimingBoxLabel">21</div>
+    <div class="TimingBox" id="TBox22">00:00</div><div class="TimingBoxLabel">22</div>
+    <div class="TimingBox" id="TBox23">00:00</div><div class="TimingBoxLabel">23</div>
+    <div class="TimingBox" id="TBox24">00:00</div><div class="TimingBoxLabel">24</div>
+    <div class="TimingBox" id="TBox25">00:00</div><div class="TimingBoxLabel">25</div>
+    <div class="TimingBox" id="TBox26">00:00</div><div class="TimingBoxLabel">26</div>
+    <div class="TimingBox" id="TBox27">00:00</div><div class="TimingBoxLabel">27</div>
+    <div class="TimingBox" id="TBox28">00:00</div><div class="TimingBoxLabel">28</div>
+    <div class="TimingBox" id="TBox29">00:00</div><div class="TimingBoxLabel">29</div>
+    <div class="TimingBox" id="TBox30">00:00</div><div class="TimingBoxLabel">30</div>
+    <div class="TimingBox" id="TBox31">00:00</div><div class="TimingBoxLabel">31</div>
+    <div class="TimingBox" id="TBox32">00:00</div><div class="TimingBoxLabel">32</div>
+    <div class="TimingBox" id="TBox33">00:00</div><div class="TimingBoxLabel">33</div>
+    <div class="TimingBox" id="TBox34">00:00</div><div class="TimingBoxLabel">34</div>
+    <div class="TimingBox" id="TBox35">00:00</div><div class="TimingBoxLabel">35</div>
+    <div class="TimingBox" id="TBox36">00:00</div><div class="TimingBoxLabel">36</div>
+    <div class="TimingBox" id="TBox37">00:00</div><div class="TimingBoxLabel">37</div>
+    <div class="TimingBox" id="TBox38">00:00</div><div class="TimingBoxLabel">38</div>
+    <div class="TimingBox" id="TBox39">00:00</div><div class="TimingBoxLabel">39</div>
+    <div class="TimingBox" id="TBox40">00:00</div><div class="TimingBoxLabel">40</div>
+</div>
+</div>
+
+<!-- Start of StatCounter Code for Dreamweaver -->
+<script type="text/javascript">
+var sc_project=8842461; 
+var sc_invisible=0; 
+var sc_security="aa91f726"; 
+var scJsHost = (("https:" == document.location.protocol) ?
+"https://secure." : "http://www.");
+document.write("<sc"+"ript type='text/javascript' src='" +
+scJsHost+
+"statcounter.com/counter/counter.js'></"+"script>");
+</script>
+
+<noscript><div class="statcounter"><a title="free hit
+counters" href="http://statcounter.com/"
+target="_blank"><img class="statcounter"
+src="http://c.statcounter.com/8842461/0/aa91f726/0/"
+alt="free hit counters"></a></div></noscript>
+<!-- End of StatCounter Code for Dreamweaver -->
+
+
+
+<span style="font-style:italic">
+&#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore). &#9786 v1.4
+<a href="ritshelp.html">Help?</a> | <a href="ritsonline-ipad.html">iPad</a> | <a href="ritsonline-android.html">Android</a>
+</span>
+</div>
+
+
+</body>
+</html>
