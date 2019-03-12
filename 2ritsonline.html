@@ -225,8 +225,6 @@ function multiClicked()
 		startClock();
                 updatePanel("START",0);
 		document.getElementById("tHeader").style.backgroundColor="#98FB98";
-		//document.getElementById("MinusBtn").disabled=false;
-		//document.getElementById("AllBtn").disabled=false;
                 document.getElementById("MinusBtn").innerHTML="Minus";
 		document.getElementById("AllBtn").innerHTML="+All";
                 document.getElementById("MinusBtn").className="ButtonHeaderSmall";
@@ -261,12 +259,18 @@ function swingBackToNormal()
 	retire=false;
 	minus=false;
 	document.getElementById("tHeader").style.backgroundColor="#98FB98";
-	if(started)
-	{
-		document.getElementById("AllBtn").disabled=false;
-	}
-	document.getElementById("RetireBtn").innerHTML="Retire";
-	document.getElementById("MinusBtn").innerHTML="Minus";	
+
+        document.getElementById("AllBtn").disabled = false;
+	
+        if (started && !stopped)
+        {
+            document.getElementById("RetireBtn").innerHTML="Retire";
+            document.getElementById("MinusBtn").innerHTML="Minus";
+        }
+        else if (!started)
+        {
+            document.getElementById("RetireBtn").innerHTML="Retire";            
+        }
 }
 
 function startClock()		//Called when Start button is clicked
@@ -290,8 +294,7 @@ function stopClock()
 	document.getElementById("RetireBtn").disabled=true;
 	document.getElementById("AllBtn").disabled=true;
 
-        updatePanel("STOP",0);
-        
+        updatePanel("STOP",0);  
 }
 
 function manageResults()
@@ -340,8 +343,8 @@ function checkEmail(x)
 	var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	if (!filter.test(x))
 	{
-	alert('Please provide a valid email address');
-	return false;
+            alert('Please provide a valid email address');
+            return false;
 	}
 	return true;
 }
@@ -421,8 +424,6 @@ function updatePanel(jobtype,x)
 			document.getElementById("StatusPanel").appendChild(txt);
 			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
 			break;
-
-
 	}
 }
 
@@ -448,8 +449,7 @@ function btnMinus()
 
 function btnRetire()
 {
-	if (!stopped)
-	//if (started && !stopped)
+	if (!stopped && started)
 	{
 		if (!retire)
 		{
@@ -465,6 +465,19 @@ function btnRetire()
 			swingBackToNormal();
 		}
 	}
+        else if (!started && !stopped)
+        {
+            if (!retire)
+            {
+                retire=true;
+                document.getElementById("tHeader").style.backgroundColor="#FFA07A";
+                document.getElementById("RetireBtn").innerHTML="Normal";
+            }
+            else
+            {
+                swingBackToNormal();
+            }
+        }
 }
 
 function btnAll()
@@ -479,9 +492,31 @@ function btnAll()
 			{
 				if (!RArray[i])
 				{
-					addLap(i);
-					updateBarAndLap(i);
-				}
+				    addLap(i);
+				    updateBarAndLap(i);
+				
+                                    str = "canvasBtn" + i;
+                                    if (totalLaps > 0)
+                                    {
+                                        if (TArray[i].length == (totalLaps - 1))    //Going Final Lap
+                                        {
+                                            document.getElementById(str).style.backgroundColor="#FF0000";
+                                        }
+                                        else if (TArray[i].length == (totalLaps - 2))   //2 More Laps
+                                        {
+                                            document.getElementById(str).style.backgroundColor="#00FF00";
+                                        }
+                                        else if (TArray[i].length >= totalLaps)     //Beyond totalLaps
+                                        {
+                                            document.getElementById(str).style.backgroundColor="#999999";
+                                        }
+                                    else
+                                    {
+                                        document.getElementById(str).style.backgroundColor="#FFFACD";
+                                    }
+                                }
+                            }
+
 			}
 			updatePanel("ALL",i);
 		}
@@ -522,13 +557,37 @@ function btnFunc(x)
 	str=str+x;
 	
 	document.getElementById(str).style.backgroundColor="#BEBEBE";
-	setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},300);
+
+        if (totalLaps > 0 && RArray[x] != true)
+        {
+            if (TArray[x].length == (totalLaps - 1))    //Going Final Lap
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#FF0000"},200);
+            }
+            else if (TArray[x].length == (totalLaps - 2))   //2 More laps
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#00FF00"},200);
+            }
+            else if (TArray[x].length >= totalLaps)     //Beyond totalLaps
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#999999"},200);
+            }
+            else
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},200);
+            }
+        }
+        else
+        {
+            setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},200);
+        }
 }
 
 function addTotalLaps()
 {
     totalLaps = totalLaps + 1;
     updatePanel("TOTALLAPS",totalLaps);
+    updateLapsBeforeRun();
 }
 
 function minusTotalLaps()
@@ -536,6 +595,7 @@ function minusTotalLaps()
     if (totalLaps > 0)
     {
         totalLaps = totalLaps - 1;
+        updateLapsBeforeRun();
         if (totalLaps > 0)
         {
             updatePanel("TOTALLAPS",totalLaps);
@@ -546,6 +606,23 @@ function minusTotalLaps()
         }
     }
 }
+
+function updateLapsBeforeRun()
+{
+    for (i=1;i<41;i++)
+    {
+        str="LapBox"+i;
+        if (totalLaps > 0)
+        {
+            document.getElementById(str).innerHTML = "0/"+totalLaps;
+        }
+        else
+        {
+            document.getElementById(str).innerHTML = "0";    
+        }
+    }
+}
+
 
 function addLap(x)
 {
@@ -611,7 +688,17 @@ function updateBarAndLap(x)
 	str="LapBox"+x;				//Update Lap
 	
 	if (!retire)
-	document.getElementById(str).innerHTML=TArray[x].length;
+        {
+            if (totalLaps > 0)
+            {
+                document.getElementById(str).innerHTML=TArray[x].length + "/" + totalLaps;
+            }
+            else
+            {
+                document.getElementById(str).innerHTML=TArray[x].length;
+                
+            }
+        }
 }
 
 /////////////////////////////////////Canvas Buttons Functions END END END ////////////////////////////////////////
@@ -633,7 +720,7 @@ function pad(val)			//Helps to pad 0 in front of figure if only 1 place
 function testFunc()
 {
 	alert("test");
-	alert(document.getElementById("RemarksBox").value);
+	//alert(document.getElementById("RemarksBox").value);
 }
 
 /////////////////////////////////////Helper Functions END END END /////////////////////////////////////////////////
