@@ -3,6 +3,7 @@
 <meta name="viewport" content="width=device-witdth, content="initial-scale">
 <head>
 <title>RiTSonline - Multi Timing solution</title>
+
 <style>
 
 .TopHeader
@@ -55,6 +56,19 @@
 	text-align:center;
 	background-color:#E6E6FA;
 }
+
+.ButtonHeaderLaps
+{
+	-webkit-appearance:none;
+	width:80px;
+	height:60px;
+	float:left;
+	font-size:40px;
+	padding:0 0 0 0;
+	text-align:center;
+	background-color:#E6E6FA;
+}
+
 
 .Remarks
 {
@@ -189,6 +203,7 @@ var started=false;
 var stopped=false;
 var minus=false;
 var retire=false;
+var totalLaps=0;
 
 ////////////////////////////////////Initialise Array/////////////////////////////////////////////////
 var TArray=new Array(41);
@@ -196,26 +211,33 @@ var RArray=new Array(41);
 
 for (i=0;i<41;i++)
 {
-	TArray[i]=new Array();
+	TArray[i]=new Array();                  //TimeArray. To hold all runners' arrays of timings.
 	RArray[i]=false;			//RetireArray. To indicate if a runner has retired
 }
 ///////////////////////////////////Initialise Array END END END//////////////////////////////////////
 
 /////////////////////////////////////Header Buttons Functions//////////////////////////////////////////
 function multiClicked()
+//This controls the behaviour of the Start/Stop/Result button.
 {
-	if (!started && !stopped)
+	if (!started && !stopped)   //Start clicked
 	{
 		startClock();
+                updatePanel("START",0);
 		document.getElementById("tHeader").style.backgroundColor="#98FB98";
-		document.getElementById("MinusBtn").disabled=false;
-		document.getElementById("AllBtn").disabled=false;
+                document.getElementById("MinusBtn").innerHTML="Minus";
+		document.getElementById("AllBtn").innerHTML="+All";
+                document.getElementById("MinusBtn").className="ButtonHeaderSmall";
+		document.getElementById("AllBtn").className="ButtonHeaderSmall";		
+                document.getElementById("MinusBtn").setAttribute('onclick', 'btnMinus()');
+		document.getElementById("AllBtn").setAttribute('onclick', 'btnAll()');
+                
 		if(retire)
 		{
 			swingBackToNormal();
 		}
 	}
-	else if (started && !stopped)
+	else if (started && !stopped)   //Stop clicked.
 	{
 		var str="Confirm Stop?";
 	
@@ -226,7 +248,7 @@ function multiClicked()
 			stopped=true;
 		}
 	}
-	else if (started && stopped)
+	else if (started && stopped)        //Results clicked.
 	{
 		manageResults();
 	}	
@@ -237,28 +259,30 @@ function swingBackToNormal()
 	retire=false;
 	minus=false;
 	document.getElementById("tHeader").style.backgroundColor="#98FB98";
-	if(started)
-	{
-		document.getElementById("AllBtn").disabled=false;
-	}
-	document.getElementById("RetireBtn").innerHTML="Retire";
-	document.getElementById("MinusBtn").innerHTML="Minus";	
+
+        document.getElementById("AllBtn").disabled = false;
+	
+        if (started && !stopped)
+        {
+            document.getElementById("RetireBtn").innerHTML="Retire";
+            document.getElementById("MinusBtn").innerHTML="Minus";
+        }
+        else if (!started)
+        {
+            document.getElementById("RetireBtn").innerHTML="Retire";            
+        }
 }
 
 function startClock()		//Called when Start button is clicked
 {
-
 	started=true;
 	document.getElementById("MultiBtn").innerHTML="Stop";
 
 	d=new Date();
 	runStartedAt=d.getTime();
-	
 	fullStartedAt=new Date();
 	
-	//document.getElementById("StatusPanel").innerHTML=pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds())+" START";
-updatePanel("START",0);
-		setInterval(setTime, 1000);
+	setInterval(setTime, 1000);
 }
 
 function stopClock()
@@ -270,10 +294,7 @@ function stopClock()
 	document.getElementById("RetireBtn").disabled=true;
 	document.getElementById("AllBtn").disabled=true;
 
-	var txt=document.createElement("br");
-	document.getElementById("StatusPanel").appendChild(txt);
-	txt=document.createTextNode(pad(d.getHours())+":"+pad(d.getMinutes())+":"+pad(d.getSeconds()+" STOP"));
-	document.getElementById("StatusPanel").appendChild(txt);
+        updatePanel("STOP",0);  
 }
 
 function manageResults()
@@ -322,8 +343,8 @@ function checkEmail(x)
 	var filter = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
 	if (!filter.test(x))
 	{
-	alert('Please provide a valid email address');
-	return false;
+            alert('Please provide a valid email address');
+            return false;
 	}
 	return true;
 }
@@ -342,6 +363,7 @@ function setTime()		//called to refresh elapsedTimeDisplay
 }
 
 function updatePanel(jobtype,x)
+//This updates the output panel, based on the jobtype.
 {
 	var txt=document.createElement("br");
 	document.getElementById("StatusPanel").appendChild(txt);
@@ -351,7 +373,12 @@ function updatePanel(jobtype,x)
 	switch(jobtype)
 	{
 		case "START":
-			txt=document.createTextNode(str+"START");
+			txt=document.createTextNode(str+"STARTED");
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
+		case "STOP":
+			txt=document.createTextNode(str+"STOPPED");
 			document.getElementById("StatusPanel").appendChild(txt);
 			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
 			break;
@@ -390,6 +417,13 @@ function updatePanel(jobtype,x)
 			document.getElementById("StatusPanel").appendChild(txt);
 			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
 			break;
+
+			
+		case "TOTALLAPS":
+			txt=document.createTextNode("Total Laps = " + x);
+			document.getElementById("StatusPanel").appendChild(txt);
+			document.getElementById("StatusPanel").scrollTop=document.getElementById("StatusPanel").scrollHeight;
+			break;
 	}
 }
 
@@ -403,7 +437,6 @@ function btnMinus()
 			retire=false;
 			document.getElementById("RetireBtn").innerHTML="Retire";
 			document.getElementById("tHeader").style.backgroundColor="#00CED1";
-			//updatePanel("MINUSMODE",0);
 			document.getElementById("MinusBtn").innerHTML="Normal";
 			document.getElementById("AllBtn").disabled=true;
 		}
@@ -416,24 +449,35 @@ function btnMinus()
 
 function btnRetire()
 {
-	if (!stopped)
-	//if (started && !stopped)
+	if (!stopped && started)
 	{
-		if (!retire)
-		{
-			retire=true;
-			minus=false;
-			document.getElementById("MinusBtn").innerHTML="Minus";
-			document.getElementById("tHeader").style.backgroundColor="#FFA07A";
-			//updatePanel("RETIREMODE",0);
-			document.getElementById("RetireBtn").innerHTML="Normal";
-			document.getElementById("AllBtn").disabled=true;
-		}
-		else
-		{
-			swingBackToNormal();
-		}
+            if (!retire)
+            {
+                    retire=true;
+                    minus=false;
+                    document.getElementById("MinusBtn").innerHTML="Minus";
+                    document.getElementById("tHeader").style.backgroundColor="#FFA07A";
+                    document.getElementById("RetireBtn").innerHTML="Normal";
+                    document.getElementById("AllBtn").disabled=true;
+            }
+            else
+            {
+                    swingBackToNormal();
+            }
 	}
+        else if (!started && !stopped)
+        {
+            if (!retire)
+            {
+                retire=true;
+                document.getElementById("tHeader").style.backgroundColor="#FFA07A";
+                document.getElementById("RetireBtn").innerHTML="Normal";
+            }
+            else
+            {
+                swingBackToNormal();
+            }
+        }
 }
 
 function btnAll()
@@ -448,9 +492,31 @@ function btnAll()
 			{
 				if (!RArray[i])
 				{
-					addLap(i);
-					updateBarAndLap(i);
-				}
+				    addLap(i);
+				    updateBarAndLap(i);
+				
+                                    str = "canvasBtn" + i;
+                                    if (totalLaps > 0)
+                                    {
+                                        if (TArray[i].length == (totalLaps - 1))    //Going Final Lap
+                                        {
+                                            document.getElementById(str).style.backgroundColor="#FF0000";
+                                        }
+                                        else if (TArray[i].length == (totalLaps - 2))   //2 More Laps
+                                        {
+                                            document.getElementById(str).style.backgroundColor="#00FF00";
+                                        }
+                                        else if (TArray[i].length >= totalLaps)     //Beyond totalLaps
+                                        {
+                                            document.getElementById(str).style.backgroundColor="#999999";
+                                        }
+                                    else
+                                    {
+                                        document.getElementById(str).style.backgroundColor="#FFFACD";
+                                    }
+                                }
+                            }
+
 			}
 			updatePanel("ALL",i);
 		}
@@ -491,8 +557,72 @@ function btnFunc(x)
 	str=str+x;
 	
 	document.getElementById(str).style.backgroundColor="#BEBEBE";
-	setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},300);
+
+        if (totalLaps > 0 && RArray[x] != true)
+        {
+            if (TArray[x].length == (totalLaps - 1))    //Going Final Lap
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#FF0000"},200);
+            }
+            else if (TArray[x].length == (totalLaps - 2))   //2 More laps
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#00FF00"},200);
+            }
+            else if (TArray[x].length >= totalLaps)     //Beyond totalLaps
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#999999"},200);
+            }
+            else
+            {
+                setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},200);
+            }
+        }
+        else
+        {
+            setTimeout(function(){document.getElementById(str).style.backgroundColor="#FFFACD"},200);
+        }
 }
+
+function addTotalLaps()
+{
+    totalLaps = totalLaps + 1;
+    updatePanel("TOTALLAPS",totalLaps);
+    updateLapsBeforeRun();
+}
+
+function minusTotalLaps()
+{
+    if (totalLaps > 0)
+    {
+        totalLaps = totalLaps - 1;
+        updateLapsBeforeRun();
+        if (totalLaps > 0)
+        {
+            updatePanel("TOTALLAPS",totalLaps);
+        }
+        else
+        {
+            updatePanel("TOTALLAPS","unlimited");
+        }
+    }
+}
+
+function updateLapsBeforeRun()
+{
+    for (i=1;i<41;i++)
+    {
+        str="LapBox"+i;
+        if (totalLaps > 0)
+        {
+            document.getElementById(str).innerHTML = "0/"+totalLaps;
+        }
+        else
+        {
+            document.getElementById(str).innerHTML = "0";    
+        }
+    }
+}
+
 
 function addLap(x)
 {
@@ -558,7 +688,17 @@ function updateBarAndLap(x)
 	str="LapBox"+x;				//Update Lap
 	
 	if (!retire)
-	document.getElementById(str).innerHTML=TArray[x].length;
+        {
+            if (totalLaps > 0)
+            {
+                document.getElementById(str).innerHTML=TArray[x].length + "/" + totalLaps;
+            }
+            else
+            {
+                document.getElementById(str).innerHTML=TArray[x].length;
+                
+            }
+        }
 }
 
 /////////////////////////////////////Canvas Buttons Functions END END END ////////////////////////////////////////
@@ -580,7 +720,7 @@ function pad(val)			//Helps to pad 0 in front of figure if only 1 place
 function testFunc()
 {
 	alert("test");
-	alert(document.getElementById("RemarksBox").value);
+	//alert(document.getElementById("RemarksBox").value);
 }
 
 /////////////////////////////////////Helper Functions END END END /////////////////////////////////////////////////
@@ -596,9 +736,9 @@ function testFunc()
     <button id="MultiBtn" onclick="multiClicked()" class="ButtonHeader">Start</button>
     
     <div class="ButtonHeaderSmallCanvas">
-        <button onclick="btnMinus()" id="MinusBtn" class="ButtonHeaderSmall" disabled>Minus</button>
         <button onclick="btnRetire()" id="RetireBtn" class="ButtonHeaderSmall">Retire</button>
-        <button onclick="btnAll()" id="AllBtn" class="ButtonHeaderSmall" disabled>+All</button>
+        <button onclick="addTotalLaps()" id="MinusBtn" class="ButtonHeaderLaps">+</button>
+        <button onclick="minusTotalLaps()" id="AllBtn" class="ButtonHeaderLaps">-</button>
         <input class="Remarks" id="RemarksBox" placeholder="Enter remarks here"></input>
     </div>
     
@@ -764,7 +904,7 @@ alt="free hit counters"></a></div></noscript>
 
 <span style="font-style:italic">
 &#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore). &#9786 v1.4
-<a href="ritshelp.html">Help?</a> | <a href="ritsonline-ipad.html">iPad</a> | <a href="ritsonline-android.html">Android</a>
+<a href="ritshelp.html">Help?</a> | <a href="ritsonline-ipad.html">iPad version</a>
 </span>
 </div>
 

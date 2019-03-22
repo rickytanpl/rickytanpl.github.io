@@ -1,19 +1,13 @@
 <!DOCTYPE html >
 <head>
 <meta name="description" content="online multi timing solution, sports timing, multi timer">
-<title>RiTSonline  - Multi Timing solution - Detecting Screen Size...</title>
-
+<title>RiTSonline  - Multi Timing solution - Detecting Device Type...</title>
 
 <script type="text/javascript">
 
 var isiPad = /ipad/i.test(navigator.userAgent.toLowerCase());
-var isAndroid = /android/i.test(navigator.userAgent.toLowerCase());
 
-if (isAndroid)
-{
-    document.location = "ritsonline-android.html";
-}
-else if (isiPad)
+if (isiPad)
 {
     document.location = "ritsonline-ipad.html";
 }
@@ -22,20 +16,7 @@ else
     document.location = "ritsonline.html";
 }
 
-/*
-if (screen.height < 640) {
-document.location = "ritsonline-widescreen.html";
-}
-else
-{
-document.location = "ritsonline-ipad.html";
-}
-*/
-
 </script>
-
-
-
 </head>
 
 <body onload="load()" bgcolor="FFEFD5">
