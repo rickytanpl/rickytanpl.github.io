@@ -21,7 +21,8 @@
 var emailstr="";
 
 function load()
-{
+{       var totalrunners=sessionStorage.getItem("TotalRunners");
+        
 	var strStartedAt=sessionStorage.getItem("KeyStartedAt");
 	strStartedAt="Timing capture started on "+strStartedAt;
 	
@@ -38,7 +39,7 @@ function load()
 	txt=document.createTextNode(str);
 	document.getElementById("results").appendChild(txt);
 
-	for (i=1;i<41;i++)
+	for (i=1;i<totalrunners;i++)
 	{
 		
 		str=document.createElement("br");					//new line
@@ -145,6 +146,6 @@ Click <a href="index.html">here </a>to go back to RiTSonline. Remember to export
 <div class="Results" id="results" ></div>
 <br>
 <hr>
-<div style="font-style:italic">&#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore).&#9786 v1.3 <a href="ritshelp.html">Help?</a> | <a href="index.html">Home</a></div>
+<div style="font-style:italic">&#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore).&#9786 v1.5 <a href="ritshelp.html">Help?</a> | <a href="index.html">Home</a></div>
 </body>
 </html>

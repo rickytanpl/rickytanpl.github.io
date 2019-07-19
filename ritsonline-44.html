@@ -107,8 +107,8 @@
 .ButtonCSS
 {	
         -webkit-appearance:none;
-	width:85px;
-	height:90px;
+	width:77px;
+	height:60px;
 	float:left;
 	font-size:40px;
 	padding:0px 0px 0px 0px;
@@ -130,7 +130,7 @@
 .ButtonCanvas
 {
 	width:850px;
-	height:480px;
+	height:360px;
 	background-color:#FFEFD5;
 	border-style:solid;
 	border-width:1px;
@@ -139,7 +139,7 @@
 
 .ButtonBox
 {
-	width:85px;
+	width:77px;
 	height:90px;
 	background-color:#6F0
 	border-style:solid;
@@ -150,7 +150,7 @@
 
 .LapCountBox
 {	
-	width:85px;
+	width:77px;
 	height:30px;
 	background-color:#09F
 	border-style:solid;
@@ -165,7 +165,7 @@
 .TimingBar
 {
 	width:108px;
-	height:480px;
+	height:360px;
 	background-color:#EECBAD;
 	border-style:solid;
 	border-width:1px;
@@ -204,7 +204,7 @@ var stopped=false;
 var minus=false;
 var retire=false;
 var totalLaps=0;
-var totalrunners = 41;
+var totalrunners = 45;
 
 ////////////////////////////////////Initialise Array/////////////////////////////////////////////////
 var TArray=new Array(totalrunners);
@@ -765,6 +765,7 @@ function testFunc()
     <button onclick="btnFunc(8)" class="ButtonCSS" id="canvasBtn8">8</button>
     <button onclick="btnFunc(9)" class="ButtonCSS" id="canvasBtn9">9</button>
     <button onclick="btnFunc(10)" class="ButtonCSS" id="canvasBtn10">10</button>
+    <button onclick="btnFunc(41)" class="ButtonCSS" id="canvasBtn41">41</button>
     
     <div class="LapCountBox" id="LapBox1">0</div>
     <div class="LapCountBox" id="LapBox2">0</div>
@@ -776,6 +777,7 @@ function testFunc()
     <div class="LapCountBox" id="LapBox8">0</div>
     <div class="LapCountBox" id="LapBox9">0</div>
     <div class="LapCountBox" id="LapBox10">0</div>
+    <div class="LapCountBox" id="LapBox41">0</div>
     
     <button onclick="btnFunc(11)" class="ButtonCSS" id="canvasBtn11">11</button>
     <button onclick="btnFunc(12)" class="ButtonCSS" id="canvasBtn12">12</button>
@@ -787,6 +789,8 @@ function testFunc()
     <button onclick="btnFunc(18)" class="ButtonCSS" id="canvasBtn18">18</button>
     <button onclick="btnFunc(19)" class="ButtonCSS" id="canvasBtn19">19</button>
     <button onclick="btnFunc(20)" class="ButtonCSS" id="canvasBtn20">20</button>
+    <button onclick="btnFunc(42)" class="ButtonCSS" id="canvasBtn42">42</button>
+
     <div class="LapCountBox" id="LapBox11">0</div>
     <div class="LapCountBox" id="LapBox12">0</div>
     <div class="LapCountBox" id="LapBox13">0</div>
@@ -797,6 +801,8 @@ function testFunc()
     <div class="LapCountBox" id="LapBox18">0</div>
     <div class="LapCountBox" id="LapBox19">0</div>
     <div class="LapCountBox" id="LapBox20">0</div>
+    <div class="LapCountBox" id="LapBox42">0</div>
+    
     <button onclick="btnFunc(21)" class="ButtonCSS" id="canvasBtn21">21</button>
     <button onclick="btnFunc(22)" class="ButtonCSS" id="canvasBtn22">22</button>
     <button onclick="btnFunc(23)" class="ButtonCSS" id="canvasBtn23">23</button>
@@ -807,6 +813,8 @@ function testFunc()
     <button onclick="btnFunc(28)" class="ButtonCSS" id="canvasBtn28">28</button>
     <button onclick="btnFunc(29)" class="ButtonCSS" id="canvasBtn29">29</button>
     <button onclick="btnFunc(30)" class="ButtonCSS" id="canvasBtn30">30</button>
+    <button onclick="btnFunc(43)" class="ButtonCSS" id="canvasBtn43">43</button>
+
     <div class="LapCountBox" id="LapBox21">0</div>
     <div class="LapCountBox" id="LapBox22">0</div>
     <div class="LapCountBox" id="LapBox23">0</div>
@@ -817,6 +825,8 @@ function testFunc()
     <div class="LapCountBox" id="LapBox28">0</div>
     <div class="LapCountBox" id="LapBox29">0</div>
     <div class="LapCountBox" id="LapBox30">0</div>
+    <div class="LapCountBox" id="LapBox43">0</div>
+    
     <button onclick="btnFunc(31)" class="ButtonCSS" id="canvasBtn31">31</button>
     <button onclick="btnFunc(32)" class="ButtonCSS" id="canvasBtn32">32</button>
     <button onclick="btnFunc(33)" class="ButtonCSS" id="canvasBtn33">33</button>
@@ -827,6 +837,8 @@ function testFunc()
     <button onclick="btnFunc(38)" class="ButtonCSS" id="canvasBtn38">38</button>
     <button onclick="btnFunc(39)" class="ButtonCSS" id="canvasBtn39">39</button>
     <button onclick="btnFunc(40)" class="ButtonCSS" id="canvasBtn40">40</button>
+    <button onclick="btnFunc(44)" class="ButtonCSS" id="canvasBtn44">44</button>
+
     <div class="LapCountBox" id="LapBox31">0</div>
     <div class="LapCountBox" id="LapBox32">0</div>
     <div class="LapCountBox" id="LapBox33">0</div>
@@ -837,6 +849,8 @@ function testFunc()
     <div class="LapCountBox" id="LapBox38">0</div>
     <div class="LapCountBox" id="LapBox39">0</div>
     <div class="LapCountBox" id="LapBox40">0</div>
+    <div class="LapCountBox" id="LapBox44">0</div>
+    
 </div>
 
 <div class="TimingBar">
@@ -880,6 +894,10 @@ function testFunc()
     <div class="TimingBox" id="TBox38">00:00</div><div class="TimingBoxLabel">38</div>
     <div class="TimingBox" id="TBox39">00:00</div><div class="TimingBoxLabel">39</div>
     <div class="TimingBox" id="TBox40">00:00</div><div class="TimingBoxLabel">40</div>
+    <div class="TimingBox" id="TBox41">00:00</div><div class="TimingBoxLabel">41</div>
+    <div class="TimingBox" id="TBox42">00:00</div><div class="TimingBoxLabel">42</div>
+    <div class="TimingBox" id="TBox43">00:00</div><div class="TimingBoxLabel">43</div>
+    <div class="TimingBox" id="TBox44">00:00</div><div class="TimingBoxLabel">44</div>
 </div>
 </div>
 
@@ -906,7 +924,7 @@ alt="free hit counters"></a></div></noscript>
 
 <span style="font-style:italic">
 &#9786 RiTSonline is a timing solution created by Ricky Tan(Singapore). &#9786 v1.5
-<a href="ritshelp.html">Help?</a> | <a href="ritsonline-44.html">44pax version</a> | <a href="ritsonline.html">Mobile phone version</a>
+<a href="ritshelp.html">Help?</a> | <a href="ritsonline.html">40pax version</a> | <a href="ritsonline-ipad.html">iPad version</a>
 </span>
 </div>
 
